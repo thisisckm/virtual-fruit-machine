@@ -1,0 +1,29 @@
+{
+  "name": "virtual-fruit-machine",
+  "version": "1.0.0",
+  "description": "Virtual Fruit Machine",
+  "main": "src/vfm.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --recursive --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thisisckm/virtual-fruit-machine.git"
+  },
+  "author": "Chandrakumar Murugesan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thisisckm/virtual-fruit-machine/issues"
+  },
+  "homepage": "https://github.com/thisisckm/virtual-fruit-machine#readme",
+  "dependencies": {
+    "@supercharge/collections": "^5.0.1",
+    "mocha": "^10.1.0",
+    "prompts": "^2.4.2",
+    "rewire": "^6.0.0",
+    "supercharge": "^1.0.0"
+  }
+}
