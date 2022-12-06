@@ -21,6 +21,8 @@
   "homepage": "https://github.com/thisisckm/virtual-fruit-machine#readme",
   "dependencies": {
     "@supercharge/collections": "^5.0.1",
+    "config": "^3.3.8",
+    "figlet": "^1.5.2",
     "mocha": "^10.1.0",
     "prompts": "^2.4.2",
     "rewire": "^6.0.0",
