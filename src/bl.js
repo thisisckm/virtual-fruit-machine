@@ -3,12 +3,86 @@ const Rules = require('./rules');
 
 module.exports = class VFM {
 
-    constructor(yourBalance) {
-        this.slotSize = 4;
+    static get resultJackpot() {
+        return 1;
+    }
+
+    static get resultLucky() {
+        return 2;
+    }
+
+    static get resultConsolation() {
+        return 3;
+    }
+
+    static get resultNone() {
+        return 4;
+    }
+
+    _slotSize = 4;
+    _config;
+    _fruits;
+
+    _bet;
+    _jackpotPrize;
+    _luckyPrize;
+    _xConsolation;
+
+    constructor(config) {
+    
+        this._config = config;
         this.myBalance = 20;
-        this.yourBalance = yourBalance;
-        this.rules = new Rules();
+        this.yourBalance = 0;
         this.credit = 0;
+        this.rules = new Rules();
+
+        this.#init();
+        this.#setupPrize();
+
+    }
+
+    #init() {
+
+        const difficulty_level = this._config.has('difficulty_level') ? this._config.get('difficulty_level') : 'normal';
+
+        switch(difficulty_level) {
+            case 'normal':
+                this._fruits = 'ABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDE';
+                break;
+            case 'easy':
+                this._fruits = 'ABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFGABCDEFG';
+                break;
+            case 'hard':
+                this._fruits = 'AAAAAAAABBBBBBBBBBBBBBBBBBCCCCCCCCCCC';
+                break;
+            default:
+                this._fruits = 'ABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDE';
+                break;
+        }
+
+        this._bet = this._config.has('bet') ? this._config.get('bet'): 0.20;
+
+    }
+
+    #setupPrize() {
+    
+        this._jackpotPrize = this._config.has('prize.jackpot') ? this._config.get('prize.jackpot'): 20;
+        this._luckyPrize = this._config.has('prize.lucky') ? this._config.get('prize.lucky') : 10;
+        this._xConsolation = this._config.has('prize.consolation_time') ? this._config.get('prize.consolation_time') : 5;
+
+    }
+
+    #shuffle(data) {
+        var a = data.split(""),
+        n = a.length;
+
+        for(var i = n - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = a[i];
+            a[i] = a[j];
+            a[j] = tmp;
+        }
+        return a.join("");
     }
 
     /**
@@ -19,13 +93,13 @@ module.exports = class VFM {
      */
     #makeSlotPosition() {
         var result = '';
-        var characters = 'ABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDEABCDE';
+        var characters = this._fruits;
+        characters = this.#shuffle(characters);
         var charactersLength = characters.length;
-        for (var i = 0; i < this.slotSize; i++) {
+        for (var i = 0; i < this._slotSize; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
-        result = result.split('');
-        result = result.sort((a, b) => 0.5 - Math.random());
+        result = result.split("");
         return result;
     }
 
@@ -37,62 +111,66 @@ module.exports = class VFM {
      * 2. Process the result based on the slot position rules
      * 3. Credit the balance based on the slot position rules
      * 
-     * @returns list of slot position, and message
+     * @returns list of slot position, and resultType
      */
     spin() {
-        const slotPosition = this.#makeSlotPosition(4)
+        const slotPosition = this.#makeSlotPosition()
 
-        // Charge fee .20p for spin
+        // Charge fee for spin
         if (this.myBalance != 0) {
-            this.myBalance += 0.2;
-            this.yourBalance -= 0.20;
+            this.myBalance += this._bet;
+            this.yourBalance -= this._bet;
 
         }
         else { // Else charge the fee from the credit
-            this.myBalance += 0.2;
-            this.credit -= 0.2;
+            this.myBalance += this._bet;
+            this.credit -= this._bet;
         }
 
-        var message = "Sorry bad luck. Give a try";
-
+        var resultType = VFM.resultNone;
+        
         if (this.rules.isJackpot(slotPosition)) { // Process for Jackpot
-            if (this.myBalance >= 20) {
-                this.myBalance -= 20;
-                this.yourBalance += 20;
+            if (this.myBalance >= this._jackpotPrize) {
+                this.myBalance -= this._jackpotPrize;
+                this.yourBalance += this._jackpotPrize;
             }
             else {
                 this.yourBalance += this.myBalance;
-                this.credit += (20 - this.myBalance);
+                this.credit += (this._jackpotPrize - this.myBalance);
                 this.myBalance = 0;
             }
-            message = "Jackpot!!! <3";
+            resultType = VFM.resultJackpot;
         }
         else if (this.rules.isLucky(slotPosition)) { // Process for different character
-            if (this.myBalance >= 10) {
-                this.myBalance -= 10;
-                this.yourBalance += 10;
+            if (this.myBalance >= this._luckyPrize) {
+                this.myBalance -= this._luckyPrize;
+                this.yourBalance += this._luckyPrize;
             }
             else {
                 this.yourBalance += this.myBalance;
-                this.credit += (10 - this.myBalance);
+                this.credit += (this._luckyPrize - this.myBalance);
                 this.myBalance = 0;
             }
-            message = "Cool. Your lucky!!! <3";
+            resultType = VFM.resultLucky;
         }
         else if (this.rules.isKeepTheChange(slotPosition)) { // Process for two or more adjacent slots containing the same character
-            if (this.myBalance >= 1) {
-                this.myBalance -= 1;
-                this.yourBalance += 1;
+            
+            const consolationPrize = this._xConsolation * this._bet;
+
+            if (this.myBalance >= consolationPrize) {
+                this.myBalance -= consolationPrize;
+                this.yourBalance += consolationPrize;
             }
             else {
                 this.yourBalance += this.myBalance;
-                this.credit += (1 - this.myBalance);
+                this.credit += (consolationPrize - this.myBalance);
                 this.myBalance = 0;
             }
-            message = "Good try!!"
+            resultType = VFM.resultConsolation;
+
         }
 
-        return [slotPosition, message];
+        return [slotPosition, resultType];
     }
 
     /**

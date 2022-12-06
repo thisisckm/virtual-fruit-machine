@@ -1,5 +1,7 @@
 # Virtual Fruit Machine
 
+> Application Version 1.2 - TUI Version - 1.1 - Algorithm version 1.2 
+
 This project demonstrates implementing Fruit Machine or Fruit Slot Machine in Node.js. This CLI application is interactive with the user using the TUI interface.
 
 ## Quick Start - Method 1:
@@ -29,7 +31,7 @@ $ cd virtual-fruit-machine
 $ npm install --save
 ```
 
-###Usage:
+### Usage:
 A simple step to run the application
 ```
 $ node src/vfm.js
@@ -37,29 +39,12 @@ $ node src/vfm.js
 To test the code
 ```
 $ npm run test
-
+```
 ## Quick Start - Method 2:
 This quick start steps for any OS with docker desktop. 
 
 ### Prerequisite 
 1. Install the latest version of the docker desktop
-2. Install the newest version of git
-
-### Setup
-1. Clone the source code of the application form git@github.com:thisisckm/virtual-fruit-machine.git
-```
-> git clone git@github.com:thisisckm/virtual-fruit-machine.git
-```
-
-2. Change to the project folder
-```
-> cd virtual-fruit-machine
-```
-3. Build the docker image
-```
-> docker build . -t virtual-fruit-machine
-```
-
 ### Usage:
 A simple step to run the application
 ```

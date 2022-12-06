@@ -1,0 +1,18 @@
+{
+    "difficulty_level": "hard",
+    "bet": 0.30,
+    "prize": {
+        "jackpot": 5,
+        "lucky": 1,
+        "consolation_time": 1
+    },
+    "local": {
+        "lang": "en-GB",
+        "currency": "GBP"
+    },
+    "message": {
+        "jackpot": "Wow Jackpot!!! <3",
+        "lucky": "Cool. Your lucky!!! <3",
+        "consolation": "Good try!!"
+    }
+}
